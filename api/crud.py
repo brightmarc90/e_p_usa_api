@@ -37,3 +37,24 @@ async def birthsBySex_Year(start_year: Union[int, None] = None, end_year: Union[
     pivot = df.pivot_table(values="nb_births", index="year", columns="gender", aggfunc="sum")
     pivot = pivot.reset_index().to_dict(orient="records")
     return pivot
+
+async def verify_proportion(start_year: int, end_year: Union[int, None] = None):
+    match_conditions = {}
+    pipeline = []
+    if start_year and end_year:
+        match_conditions["year"] = {"$gte": start_year, "$lte": end_year}
+    elif start_year:
+        match_conditions["year"] = start_year
+
+    if match_conditions:
+        pipeline.append({"$match": match_conditions})
+
+    pipeline.append({"$project": {"_id": 0}})
+
+    births = await collection.aggregate(pipeline).to_list(length=None)
+    if not births:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun résultat")
+    df = pd.DataFrame(births)
+    df["total_by_sex"] = df.groupby(["year", "gender"])["nb_occur"].transform("sum")
+    df["proportion"] = df["nb_occur"] / df["total_by_sex"]
+    return df.to_dict(orient="records")
