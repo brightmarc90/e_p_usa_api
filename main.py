@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status
 from api.database import collection
 from api import crud
-from api.schema import BirthSexYear_Schema
+from api.schema import *
 from typing import List, Union
 
 app = FastAPI()
@@ -15,6 +15,11 @@ async def getYearList():
 async def birthsBySex_Year(start_year: Union[int, None] = None, end_year: Union[int, None] = None):
     births = await crud.birthsBySex_Year(start_year=start_year, end_year=end_year)
     return births
+
+@app.get("/group-proportions", response_model=List[Proportion_Schema])
+async def verify_proportion(start_year: int = 2018, end_year: Union[int, None] = None):
+    proportions = await crud.verify_proportion(start_year=start_year, end_year=end_year)
+    return proportions
 
 @app.get("/")
 async def root():
