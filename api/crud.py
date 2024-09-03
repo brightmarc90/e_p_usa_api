@@ -72,7 +72,7 @@ async def verify_proportion(start_year: int, end_year: Union[int, None] = None):
     df["proportion"] = df["nb_occur"] / df["total_by_sex"]
     return df.to_dict(orient="records")
 
-async def pivotFirstname_year(params: List[str], start_year: int, end_year: Union[int, None] = None):
+""" async def pivotFirstname_year(params: List[str], start_year: int, end_year: Union[int, None] = None):
     match_conditions = {}
     pipeline = []
     if start_year and end_year:
@@ -84,24 +84,38 @@ async def pivotFirstname_year(params: List[str], start_year: int, end_year: Unio
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun résultat")
     match_conditions["firstname"] = {"$in": params}
     pipeline.append({"$match": match_conditions})
-    pipeline.append({"$group": {"_id": ["$year","$firstname"], "total": {"$sum": "$nb_occur"}}})
+    pipeline.append({"$project": {"_id": 0}})
     births = await collection.aggregate(pipeline).to_list(length=None)
-    #print(births)
-    """ data = [{
-            "year": birth["_id"][0],
-            "firstname": birth["_id"][1],
-            "total": birth["total"]} for birth in births] """
-    """  data = [{"firstname": birth["_id"][1],
-             "years":[{"year": sBirth["_id"][0], "total": sBirth["total"]} for sBirth in births 
-                      if (birth["_id"][1] == sBirth["_id"][1])]} for birth in births] """
-    data = []
-    for birth in births:
-        birthObject = {}       
-        birthObject["firstname"] = birth["_id"][1]
-        birthObject["years"] = []
-        for birth2 in births:
-            if birth["_id"][1] == birth2["_id"][1]:
-                birthObject["years"].append({"year": birth2["_id"][0], "total": birth2["total"]})
-        if birthObject["firstname"] not in [ elmt["firstname"] for elmt in data]:
-            data.append(birthObject)
+    df = pd.DataFrame(births)
+    grouped_df = df.groupby(["firstname", "year"]).agg(total=("nb_occur", "sum")).reset_index()
+    data = grouped_df.groupby("firstname").apply(
+        lambda x: {
+        "firstname": x.iloc[0]["firstname"],
+        "years": x[['year', 'total']].to_dict(orient='records')
+    }
+    ).to_list()
+    return data """
+
+async def firstname_trends(params: List[str], start_year: int, end_year: Union[int, None] = None):
+    match_conditions = {}
+    pipeline = []
+    if start_year and end_year:
+        match_conditions["year"] = {"$gte": start_year, "$lte": end_year}
+    elif start_year:
+        match_conditions["year"] = start_year
+
+    if not params:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aucun résultat")
+    match_conditions["firstname"] = {"$in": params}
+    pipeline.append({"$match": match_conditions})
+    pipeline.append({"$project": {"_id": 0}})
+    births = await collection.aggregate(pipeline).to_list(length=None)
+    df = pd.DataFrame(births)
+    grouped_df = df.groupby(["firstname", "year"]).agg(total=("nb_occur", "sum")).reset_index()
+    data = grouped_df.groupby('firstname').apply(
+    lambda x: {
+        "firstname": x.iloc[0]["firstname"],
+        "years": x[['year', 'total']].to_dict(orient='records')
+    }
+    ).tolist()
     return data

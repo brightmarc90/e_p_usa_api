@@ -28,8 +28,13 @@ async def verify_proportion(start_year: int = 2018, end_year: Union[int, None] =
 
 @app.post("/year-name-pivot", response_model=List[PivotYearName_Schema], status_code=status.HTTP_200_OK)
 async def pivotFirstname_year(params: List[str], start_year: int = 2018, end_year: Union[int, None] = None):
-    pivot_data = await crud.pivotFirstname_year(params=params, start_year=start_year, end_year=end_year)
+    pivot_data = await crud.firstname_trends(params=params, start_year=start_year, end_year=end_year)
     return pivot_data
+
+@app.post("/name-trends", response_model=List[PivotYearName_Schema],status_code=status.HTTP_200_OK)
+async def firstname_trends(params: List[str], start_year: int = 2018, end_year: Union[int, None] = None):
+    trends = await crud.firstname_trends(params=params, start_year=start_year, end_year=end_year)
+    return trends
 
 @app.get("/")
 async def root():
