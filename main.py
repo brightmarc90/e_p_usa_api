@@ -6,6 +6,7 @@ from typing import List, Union
 
 app = FastAPI()
 
+
 @app.get("/years", response_model=List[int], status_code=status.HTTP_200_OK)
 async def getYearList():
     years = await crud.getYearList()
