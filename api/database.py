@@ -10,6 +10,6 @@ from pymongo import MongoClient
 
 
 # Connection MongoDB
-client = MongoClient("mongodb://localhost:27017/")  # Assurez-vous que MongoDB tourne sur le port par défaut
-db = client["e_p_usa"]  # Remplacez par votre nom de base de données
+client = MongoClient("mongodb+srv://krachenbeatz:Sonia220364@@@epusa.ebpdb.mongodb.net/")  # Assurez-vous que MongoDB tourne sur le port par défaut
+db = client["epusa"]  # Remplacez par votre nom de base de données
 collection = db["names"]  # Remplacez par le nom de votre collection

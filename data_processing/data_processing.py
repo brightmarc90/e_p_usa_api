@@ -1,10 +1,14 @@
 import os
 import json
+import urllib.parse
 from pymongo import MongoClient
 
+# Échapper le mot de passe avec urllib.parse.quote_plus
+password = urllib.parse.quote_plus("Sonia220364@@@")  # Ici, le mot de passe est encodé
+
 # Connection MongoDB
-client = MongoClient("mongodb://localhost:27017/")  # Assurez-vous que MongoDB tourne sur le port par défaut
-db = client["e_p_usa"]  # Remplacez par votre nom de base de données
+client = MongoClient("mongodb+srv://krachenbeatz:{password}@epusa.ebpdb.mongodb.net/")
+db = client["epusa"]  # Remplacez par votre nom de base de données
 collection = db["names"]  # Remplacez par le nom de votre collection
 
 files_location = "../names"
