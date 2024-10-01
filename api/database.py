@@ -1,15 +1,17 @@
-# from motor.motor_asyncio import AsyncIOMotorClient
-# import os
-# import json
+import urllib.parse
 from pymongo import MongoClient
 
-# mongo_uri = os.getenv("MONGO_URI")
-# client = AsyncIOMotorClient(mongo_uri)
-# database = client["e_p_usa"]
-# collection = database["names"]
+# Mot de passe avec des caractères spéciaux doit être encodé
+username = "krachenbeatz"
+password = "Sonia220364@@@"
+encoded_password = urllib.parse.quote_plus(password)
 
+# Construisez l'URI avec le mot de passe encodé
+mongo_uri = f"mongodb+srv://{username}:{encoded_password}@epusa.ebpdb.mongodb.net/"
 
-# Connection MongoDB
-client = MongoClient("mongodb+srv://krachenbeatz:Sonia220364@@@epusa.ebpdb.mongodb.net/")  # Assurez-vous que MongoDB tourne sur le port par défaut
-db = client["epusa"]  # Remplacez par votre nom de base de données
-collection = db["names"]  # Remplacez par le nom de votre collection
+# Initialisez le client MongoDB
+client = MongoClient(mongo_uri)
+
+# Accédez à votre base de données et à votre collection
+database = client["e_p_usa"]
+collection = database["names"]
