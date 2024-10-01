@@ -13,5 +13,5 @@ mongo_uri = f"mongodb+srv://{username}:{encoded_password}@epusa.ebpdb.mongodb.ne
 client = MongoClient(mongo_uri)
 
 # Accédez à votre base de données et à votre collection
-database = client["e_p_usa"]
+database = client["epusa"]
 collection = database["names"]
